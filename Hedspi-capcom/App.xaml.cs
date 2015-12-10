@@ -62,36 +62,21 @@ namespace Hedspi_capcom
 		protected override void OnStartup(StartupEventArgs e)
 		{
 			this.ChangeState(ApplicationState.Startup);
-
-			// 開発中に多重起動検知ついてると起動できなくて鬱陶しいので
-			// デバッグ時は外すんじゃもん
-#if !DEBUG
-			var appInstance = new MetroTrilithon.Desktop.ApplicationInstance().AddTo(this);
-			if (appInstance.IsFirst)
-#endif
+			
+			this.DispatcherUnhandledException += (sender, args) =>
 			{
-				this.DispatcherUnhandledException += (sender, args) =>
-				{
-					ReportException(sender, args.Exception);
-					args.Handled = true;
-				};
+				ReportException(sender, args.Exception);
+				args.Handled = true;
+			};
 
-				DispatcherHelper.UIDispatcher = this.Dispatcher;
+			DispatcherHelper.UIDispatcher = this.Dispatcher;
 
 
-				ThemeService.Current.Initialize(this, Theme.Dark, Accent.Purple);
+			ThemeService.Current.Initialize(this, Theme.Dark, Accent.Purple);
 
-				ViewModelRoot = new MainWindowViewModel();
-				this.MainWindow = new MainWindow { DataContext = ViewModelRoot };
-				this.MainWindow.Show();
-			}
-#if !DEBUG
-			else
-			{
-				this.ChangeState(ApplicationState.Terminate);
-				this.Shutdown();
-			}
-#endif
+			ViewModelRoot = new MainWindowViewModel();
+			this.MainWindow = new MainWindow { DataContext = ViewModelRoot };
+			this.MainWindow.Show();
 		}
 
 
