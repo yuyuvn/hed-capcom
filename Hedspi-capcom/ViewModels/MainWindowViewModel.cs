@@ -182,11 +182,29 @@ namespace Hedspi_capcom.ViewModels
 						StartBroadcast();
 					}
 					buffer = new byte[16];
+					
+					float leftX = state.ThumbSticks.Left.X;
+					float triggerRight = state.Triggers.Right;
+					float triggerLeft = state.Triggers.Left;
 
-					BitConverter.GetBytes(state.ThumbSticks.Left.X).CopyTo(buffer, 0);
+
+					if (state.DPad.Left == ButtonState.Pressed || state.DPad.Right == ButtonState.Pressed)
+					{
+						leftX = state.DPad.Left == ButtonState.Pressed ? -1 : 1;
+                    }
+					if (state.DPad.Up == ButtonState.Pressed)
+					{
+						triggerRight = 1;
+                    }
+					if (state.DPad.Down == ButtonState.Pressed)
+					{
+						triggerLeft = 1;
+					}
+
+					BitConverter.GetBytes(leftX).CopyTo(buffer, 0);
 					BitConverter.GetBytes(state.ThumbSticks.Left.Y).CopyTo(buffer, 4);
-					BitConverter.GetBytes(state.Triggers.Right).CopyTo(buffer, 8);
-					BitConverter.GetBytes(state.Triggers.Left).CopyTo(buffer, 12);
+					BitConverter.GetBytes(triggerRight).CopyTo(buffer, 8);
+					BitConverter.GetBytes(triggerLeft).CopyTo(buffer, 12);
 
 					stream.Write(buffer, 0, buffer.Length);
 				}
