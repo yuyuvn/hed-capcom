@@ -11,12 +11,15 @@
 				   xmlns:views="clr-namespace:Hedspi_capcom.Views"
 				   xmlns:viewModels="clr-namespace:Hedspi_capcom.ViewModels"
 				   xmlns:models="clr-namespace:Hedspi_capcom.Models"
+				   xmlns:controls="clr-namespace:Hedspi_capcom.Controls"
 				   mc:Ignorable="d"
 				   d:DataContext="{d:DesignInstance viewModels:MainWindowViewModel}"
 				   Title="{Binding Title}"
 				   FontSize="12"
-                   Width="350"
+                   Width="400"
                    Height="170"
+				   MinWidth="400"
+				   MinHeight="170"
 				   IsRestoringWindowPlacement="True"
 				   SnapsToDevicePixels="True"
                    Background="{DynamicResource ThemeBrushKey}"
@@ -27,7 +30,7 @@
 
 	<i:Interaction.Triggers>
 		<i:EventTrigger EventName="Closing">
-			<!--<livet:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Closing"/>-->
+			<livet:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Closing"/>
 		</i:EventTrigger>
 	</i:Interaction.Triggers>
 
@@ -43,7 +46,46 @@
 				   x:FieldModifier="private"
 				   metro:MetroWindow.IsCaptionBar="True">
 			<Border DockPanel.Dock="Bottom"
-					Height="4" />
+					Height="4"/>
+
+			<controls:AppIcon Width="36"
+							Height="36"
+							Background="Transparent"
+							AnchorVisibility="Collapsed"
+							BandVisibility="Collapsed"
+					Margin="10 0 0 0">
+				<controls:AppIcon.Style>
+					<Style TargetType="{x:Type controls:AppIcon}">
+						<Setter Property="Background"
+				Value="#FF333333" />
+						<Setter Property="Template">
+							<Setter.Value>
+								<ControlTemplate TargetType="{x:Type controls:AppIcon}">
+									<Border Background="{TemplateBinding Background}"
+							BorderBrush="{TemplateBinding BorderBrush}"
+							BorderThickness="{TemplateBinding BorderThickness}">
+										<Viewbox>
+											<Canvas HorizontalAlignment="Left"
+									Height="392"
+									UseLayoutRounding="False"
+									VerticalAlignment="Top"
+									Width="669">
+												<Path Fill="#0067ab" Data=" M 15.35 5.51 C 18.85 4.58 22.50 5.22 26.06 5.37 C 85.68 8.89 145.30 12.52 204.88 16.70 C 209.19 17.06 214.79 19.86 214.03 25.00 C 213.87 67.68 214.26 110.36 213.77 153.02 C 214.26 158.12 208.36 160.57 204.10 160.68 C 143.09 162.92 82.06 164.95 21.04 167.29 C 16.35 167.90 9.76 165.69 9.76 160.08 C 10.74 110.41 8.69 60.72 9.80 11.04 C 9.64 7.91 12.71 6.15 15.35 5.51 Z" />
+												<Path Fill="#0067ab" Data=" M 635.51 5.81 C 641.03 5.62 646.53 4.89 652.06 5.05 C 655.10 5.31 659.02 6.70 659.65 10.10 C 660.87 59.09 658.74 108.09 659.74 157.08 C 659.88 162.02 654.21 164.58 649.93 164.26 C 590.60 161.84 531.25 159.94 471.91 157.67 C 467.62 157.52 462.08 154.99 462.50 149.92 C 462.48 107.95 462.53 65.97 462.48 24.00 C 461.99 18.94 467.76 16.70 471.90 16.36 C 526.41 12.52 580.96 9.10 635.51 5.81 Z" />
+												<Path Fill="#1894d1" Data=" M 235.32 18.48 C 238.77 17.37 242.44 17.80 246.01 17.74 C 309.69 17.75 373.37 17.75 437.05 17.74 C 440.68 17.73 444.74 18.93 446.80 22.14 C 447.41 23.67 447.20 25.37 447.28 26.97 C 447.21 68.66 447.28 110.34 447.25 152.02 C 447.54 157.30 441.22 159.22 436.97 159.23 C 371.34 159.27 305.69 159.27 240.05 159.23 C 235.87 159.21 229.64 157.20 229.99 152.03 C 230.04 109.35 229.94 66.66 230.03 23.98 C 229.99 21.03 232.85 19.29 235.32 18.48 Z" />
+												<Path Fill="#0067ab" Data=" M 238.24 164.35 C 304.52 164.08 370.81 164.29 437.09 164.24 C 441.22 164.22 447.07 166.03 447.23 170.96 C 447.27 213.64 447.26 256.33 447.24 299.02 C 447.32 304.11 441.18 305.79 437.08 305.96 C 371.74 306.05 306.40 305.97 241.06 306.00 C 236.76 306.02 229.96 304.53 230.01 299.11 C 230.00 256.41 229.98 213.72 230.01 171.03 C 229.75 166.69 234.73 164.83 238.24 164.35 Z" />
+												<Path Fill="#1894d1" Data=" M 471.90 165.21 C 482.23 164.65 492.57 163.15 502.94 163.98 C 553.64 165.99 604.34 167.98 655.02 170.33 C 656.64 170.38 658.26 170.30 659.88 170.22 C 660.81 191.14 659.93 212.09 660.01 233.02 C 659.52 257.38 659.82 281.79 659.82 306.13 C 658.63 310.75 653.20 312.28 648.97 311.79 C 591.98 309.54 534.98 307.64 477.99 305.57 C 473.57 305.39 468.62 305.82 464.91 302.93 C 462.98 301.63 462.38 299.20 462.48 297.00 C 462.52 255.34 462.47 213.68 462.51 172.02 C 462.56 167.38 468.01 165.51 471.90 165.21 Z" />
+												<Path Fill="#1894d1" Data=" M 10.52 173.67 C 77.37 170.81 144.22 168.13 211.08 165.59 C 213.18 166.42 214.28 168.76 214.02 170.95 C 213.98 213.64 214.01 256.34 214.01 299.04 C 214.61 304.23 209.06 307.24 204.59 307.40 C 143.74 309.64 82.87 311.65 22.03 314.03 C 17.87 314.42 12.77 313.23 11.05 308.95 C 10.30 304.68 10.94 300.33 10.97 296.03 C 11.28 255.24 10.17 214.47 10.52 173.67 Z" />
+												<Path Fill="#1894d1" Data=" M 300.08 320.20 C 323.74 320.30 347.40 320.29 371.05 320.20 C 371.44 331.39 371.15 342.60 371.20 353.79 C 382.82 357.12 394.87 361.67 403.08 370.94 C 405.79 374.41 408.80 379.16 407.60 383.57 C 391.98 387.22 376.05 389.45 360.08 390.92 C 354.41 392.12 348.70 390.65 342.99 390.98 C 334.02 391.27 324.98 390.36 316.06 391.65 C 298.35 389.69 280.56 387.71 263.19 383.51 C 263.35 376.18 268.15 370.02 273.77 365.78 C 281.49 359.93 290.69 356.38 299.99 353.89 C 300.06 342.66 299.90 331.43 300.08 320.20 Z" />
+											</Canvas>
+										</Viewbox>
+									</Border>
+								</ControlTemplate>
+							</Setter.Value>
+						</Setter>
+					</Style>
+				</controls:AppIcon.Style>
+			</controls:AppIcon>
 
 			<StackPanel DockPanel.Dock="Right"
 						Orientation="Horizontal"
@@ -52,27 +94,29 @@
 						WindowChrome.IsHitTestVisibleInChrome="True">
 				<metro:SystemButtons />
 			</StackPanel>
-			<TextBlock Text="{Binding Title}"
-					   Style="{DynamicResource CaptionTextStyleKey}"
-					   Margin="2,0,8,0" />
+			<TextBlock Style="{DynamicResource CaptionTextStyleKey}"
+					   Margin="5,0,8,0">
+				<Run  Text="{Binding Title, Mode=OneWay}"/> 
+				v<Run  Text="{Binding Version, Mode=OneWay}"/>
+			</TextBlock>
 		</DockPanel>
 		<!-- #endregion -->
 		<Grid Grid.Row="1" Margin="12,0">
 			<Grid.RowDefinitions>
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
-				<RowDefinition Height="Auto" />
+				<RowDefinition Height="*" />
 			</Grid.RowDefinitions>
 			<Grid.ColumnDefinitions>
 				<ColumnDefinition Width="Auto" />
-				<ColumnDefinition Width="Auto" />
+				<ColumnDefinition Width="*" />
 			</Grid.ColumnDefinitions>
 
 			<TextBlock Text="Network Interface:"/>
 
 			<metro:PromptComboBox Grid.Column="1"
                                     Margin="8 0 0 8"
-                                    HorizontalAlignment="Left"
+                                    HorizontalAlignment="Stretch"
                                   Prompt="You are not connect to any interface"
                                     ItemsSource="{Binding Interfaces}"
                                   SelectedItem="{Binding Interface}"
@@ -84,7 +128,7 @@
 			<metro:PromptComboBox Grid.Column="1"
                                   Grid.Row="1"
                                     Margin="8 0 0 0"
-                                    HorizontalAlignment="Left"
+                                    HorizontalAlignment="Stretch"
                                     ItemsSource="{Binding IPList}"
                                   SelectedItem="{Binding IPAddress}"
                                   Prompt="You don't have IP Address"
@@ -94,9 +138,10 @@
 			<metro2:CallMethodButton DockPanel.Dock="Right"
                                      Grid.Row="2"
                                      Grid.ColumnSpan="2"
+									 VerticalAlignment="Stretch"
 									 MethodName="StartBroadcast"
 									 MinWidth="110"
-                                     Height="40"
+                                     MinHeight="40"
 									 Padding="30,6"
 									 Margin="6">
 				<metro2:CallMethodButton.Style>

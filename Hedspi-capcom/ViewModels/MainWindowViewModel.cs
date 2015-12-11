@@ -144,6 +144,11 @@ namespace Hedspi_capcom.ViewModels
 
 		#endregion
 
+		public string Version
+		{
+			get { return System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString(); }
+		}
+
 		private UdpNetwork Broadcast;
 		private TcpNetwork Capcom;
 		private Video Video;
@@ -174,41 +179,51 @@ namespace Hedspi_capcom.ViewModels
 
 				byte[] buffer;
 
-				GamePadState state = GamePad.GetState(PlayerIndex.One);
-				if (state.IsConnected)
+				try
 				{
-					if (state.Buttons.Start == ButtonState.Pressed)
+					GamePadState state = GamePad.GetState(PlayerIndex.One);
+					if (state.IsConnected)
 					{
-						StartBroadcast();
+						if (state.Buttons.Start == ButtonState.Pressed)
+						{
+							StartBroadcast();
+						}
+						buffer = new byte[20];
+
+						float leftX = state.ThumbSticks.Left.X;
+						float triggerRight = state.Triggers.Right;
+						float triggerLeft = state.Triggers.Left;
+
+
+						if (state.DPad.Left == ButtonState.Pressed || state.DPad.Right == ButtonState.Pressed)
+						{
+							leftX = state.DPad.Left == ButtonState.Pressed ? -1 : 1;
+						}
+						if (state.DPad.Up == ButtonState.Pressed)
+						{
+							triggerRight = 1;
+						}
+						if (state.DPad.Down == ButtonState.Pressed)
+						{
+							triggerLeft = 1;
+						}
+
+						BitConverter.GetBytes(leftX).CopyTo(buffer, 0);
+						BitConverter.GetBytes(state.ThumbSticks.Left.Y).CopyTo(buffer, 4);
+						BitConverter.GetBytes(triggerRight).CopyTo(buffer, 8);
+						BitConverter.GetBytes(triggerLeft).CopyTo(buffer, 12);
+						BitConverter.GetBytes(state.Buttons.X == ButtonState.Pressed).CopyTo(buffer, 16);
+						BitConverter.GetBytes(state.Buttons.Y == ButtonState.Pressed).CopyTo(buffer, 17);
+						BitConverter.GetBytes(state.Buttons.B == ButtonState.Pressed).CopyTo(buffer, 18);
+						BitConverter.GetBytes(state.Buttons.A == ButtonState.Pressed).CopyTo(buffer, 19);
+
+						stream.Write(buffer, 0, buffer.Length);
 					}
-					buffer = new byte[16];
-					
-					float leftX = state.ThumbSticks.Left.X;
-					float triggerRight = state.Triggers.Right;
-					float triggerLeft = state.Triggers.Left;
-
-
-					if (state.DPad.Left == ButtonState.Pressed || state.DPad.Right == ButtonState.Pressed)
-					{
-						leftX = state.DPad.Left == ButtonState.Pressed ? -1 : 1;
-                    }
-					if (state.DPad.Up == ButtonState.Pressed)
-					{
-						triggerRight = 1;
-                    }
-					if (state.DPad.Down == ButtonState.Pressed)
-					{
-						triggerLeft = 1;
-					}
-
-					BitConverter.GetBytes(leftX).CopyTo(buffer, 0);
-					BitConverter.GetBytes(state.ThumbSticks.Left.Y).CopyTo(buffer, 4);
-					BitConverter.GetBytes(triggerRight).CopyTo(buffer, 8);
-					BitConverter.GetBytes(triggerLeft).CopyTo(buffer, 12);
-
-					stream.Write(buffer, 0, buffer.Length);
 				}
-
+				catch (System.IO.IOException)
+				{
+					StartBroadcast();
+				}
 				Thread.Sleep(16);
 			};
 
@@ -242,7 +257,7 @@ namespace Hedspi_capcom.ViewModels
 						while (!ct.IsCancellationRequested)
 						{
 							//ct.ThrowIfCancellationRequested();
-							Broadcast.SendBroadcast(IPAddressInformation, 11000, String.Format("HED-Capcom v1.0\nIP:{0}\nCapcom:12000\nStream:12345", IPAddressInformation.Address));
+							Broadcast.SendBroadcast(IPAddressInformation, 11000, String.Format("HED-Capcom v{0}\nIP:{1}\nCapcom:12000\nStream:12345", Version, IPAddressInformation.Address));
 							Thread.Sleep(1000);
 						}
 					}, CToken.Token);
