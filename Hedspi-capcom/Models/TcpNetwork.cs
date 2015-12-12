@@ -105,7 +105,7 @@ namespace Hedspi_capcom.Models
 			{
 				Console.WriteLine("SocketException: {0}", e);
 			}
-			catch (OperationCanceledException e)
+			catch (OperationCanceledException)
 			{
 				var disConntectedHandler = DisConnectedHandler;
 				if (disConntectedHandler != null)
