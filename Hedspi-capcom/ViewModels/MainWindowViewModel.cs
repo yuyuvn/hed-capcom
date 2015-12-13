@@ -197,15 +197,15 @@ namespace Hedspi_capcom.ViewModels
 
 						if (state.DPad.Left == ButtonState.Pressed || state.DPad.Right == ButtonState.Pressed)
 						{
-							leftX = state.DPad.Left == ButtonState.Pressed ? -1 : 1;
+							leftX = state.DPad.Left == ButtonState.Pressed ? -0.5F : 0.5F;
 						}
 						if (state.DPad.Up == ButtonState.Pressed)
 						{
-							triggerRight = 1;
+							triggerRight = 0.5F;
 						}
 						if (state.DPad.Down == ButtonState.Pressed)
 						{
-							triggerLeft = 1;
+							triggerLeft = 0.5F;
 						}
 
 						BitConverter.GetBytes(leftX).CopyTo(buffer, 0);
@@ -258,6 +258,14 @@ namespace Hedspi_capcom.ViewModels
 						{
 							//ct.ThrowIfCancellationRequested();
 							Broadcast.SendBroadcast(IPAddressInformation, 11000, String.Format("HED-Capcom v{0}\nIP:{1}\nCapcom:12000\nStream:12345", Version, IPAddressInformation.Address));
+							GamePadState state = GamePad.GetState(PlayerIndex.One);
+							if (state.IsConnected)
+							{
+								if (state.Buttons.Start == ButtonState.Pressed)
+								{
+									StartBroadcast();
+								}
+							}
 							Thread.Sleep(1000);
 						}
 					}, CToken.Token);
