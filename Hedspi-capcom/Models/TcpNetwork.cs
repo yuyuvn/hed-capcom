@@ -12,8 +12,8 @@ namespace Hedspi_capcom.Models
 	class TcpNetwork
 	{
 		#region ConnectedHandler property
-		private volatile Action<string, NetworkStream> _ConnectedHandler;
-		public Action<string, NetworkStream> ConnectedHandler
+		private volatile Action<string, NetworkStream, TcpClient> _ConnectedHandler;
+		public Action<string, NetworkStream, TcpClient> ConnectedHandler
 		{
 			get { return _ConnectedHandler; }
 			set { _ConnectedHandler = value; }
@@ -38,7 +38,7 @@ namespace Hedspi_capcom.Models
 
 		public void StartListener(int port, CancellationToken ct)
 		{
-			try
+            try
 			{
 				// TcpListener server = new TcpListener(port);
 				Connection = new TcpListener(IPAddress.Any, port);
@@ -57,7 +57,7 @@ namespace Hedspi_capcom.Models
 
 					// Perform a blocking call to accept requests.
 					// You could also user server.AcceptSocket() here.
-					var client = Connection.AcceptTcpClient();
+					TcpClient client = Connection.AcceptTcpClient();
 					Console.WriteLine("Connected!");
 
 					// Get a stream object for reading and writing
@@ -65,7 +65,7 @@ namespace Hedspi_capcom.Models
 					int i;
 
 					// Loop to receive all the data sent by the client.
-					while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+					while (client.Connected && ((i = stream.Read(bytes, 0, bytes.Length)) != 0))
 					{
 						// Translate data bytes to a ASCII string.
 						data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
@@ -74,7 +74,7 @@ namespace Hedspi_capcom.Models
 
 						if (data.Substring(0, 8) == "HED-Robo")
 						{
-							while (true)
+							while (client.Connected)
 							{
 								if (ct.IsCancellationRequested)
 								{
@@ -86,9 +86,12 @@ namespace Hedspi_capcom.Models
 								var conntectedHandler = ConnectedHandler;
 								if (conntectedHandler != null)
 								{
-									conntectedHandler(data, stream);
+									conntectedHandler(data, stream, client);
 								}
-							}
+								stream.FlushAsync();
+
+								Thread.Sleep(16);
+                            }
 						}
 						else
 						{
@@ -97,8 +100,7 @@ namespace Hedspi_capcom.Models
 							client.Close();
 							break;
 						}
-					}
-
+                    }
 				}
 			}
 			catch (SocketException e)
@@ -112,6 +114,10 @@ namespace Hedspi_capcom.Models
 				{
 					disConntectedHandler();
 				}
+			}
+			catch (InvalidOperationException e)
+			{
+				Console.WriteLine("InvalidOperationException: {0}", e);
 			}
 			finally
 			{

@@ -155,6 +155,8 @@ namespace Hedspi_capcom.ViewModels
 		private CancellationTokenSource CToken;
 		private CancellationTokenSource CToken2;
 
+		private CommandSenderVersionSelector CommandHandler;
+
 		public MainWindowViewModel()
 		{
 			Title = "Hedspi Capcom";
@@ -168,63 +170,32 @@ namespace Hedspi_capcom.ViewModels
 			Video = new Video();
 			this.CompositeDisposable.Add(Video);
 
-			Capcom.ConnectedHandler += (String messages, NetworkStream stream) =>
+			Capcom.ConnectedHandler += (String messages, NetworkStream stream, TcpClient client) =>
 			{
 				if (Status != CapcomMode.Connected)
 				{
-					Console.WriteLine("Robo connected.");
-					Status = CapcomMode.Connected;
-					CToken.Cancel();
-				}
-
-				byte[] buffer;
-
-				try
-				{
-					GamePadState state = GamePad.GetState(PlayerIndex.One);
-					if (state.IsConnected)
+					CommandHandler = new CommandSenderVersionSelector();
+					if (CommandHandler.StartSend(messages, stream))
 					{
-						if (state.Buttons.Start == ButtonState.Pressed)
-						{
-							StartBroadcast();
-						}
-						buffer = new byte[20];
-
-						float leftX = state.ThumbSticks.Left.X;
-						float triggerRight = state.Triggers.Right;
-						float triggerLeft = state.Triggers.Left;
-
-
-						if (state.DPad.Left == ButtonState.Pressed || state.DPad.Right == ButtonState.Pressed)
-						{
-							leftX = state.DPad.Left == ButtonState.Pressed ? -0.5F : 0.5F;
-						}
-						if (state.DPad.Up == ButtonState.Pressed)
-						{
-							triggerRight = 0.5F;
-						}
-						if (state.DPad.Down == ButtonState.Pressed)
-						{
-							triggerLeft = 0.5F;
-						}
-
-						BitConverter.GetBytes(leftX).CopyTo(buffer, 0);
-						BitConverter.GetBytes(state.ThumbSticks.Left.Y).CopyTo(buffer, 4);
-						BitConverter.GetBytes(triggerRight).CopyTo(buffer, 8);
-						BitConverter.GetBytes(triggerLeft).CopyTo(buffer, 12);
-						BitConverter.GetBytes(state.Buttons.X == ButtonState.Pressed).CopyTo(buffer, 16);
-						BitConverter.GetBytes(state.Buttons.Y == ButtonState.Pressed).CopyTo(buffer, 17);
-						BitConverter.GetBytes(state.Buttons.B == ButtonState.Pressed).CopyTo(buffer, 18);
-						BitConverter.GetBytes(state.Buttons.A == ButtonState.Pressed).CopyTo(buffer, 19);
-
-						stream.Write(buffer, 0, buffer.Length);
+                        Console.WriteLine("Robo connected.");
+						Status = CapcomMode.Connected;
+						CToken.Cancel();
+					}
+					else
+					{
+						Console.WriteLine("Data received: {0}", messages);
+                        stream.Close();
+						client.Close();
 					}
 				}
-				catch (System.IO.IOException)
+				else
 				{
-					StartBroadcast();
+					if (!CommandHandler.Send(stream))
+					{
+						StartBroadcast();
+					}
 				}
-				Thread.Sleep(16);
+				
 			};
 
 			Capcom.DisConnectedHandler += () =>
@@ -282,6 +253,7 @@ namespace Hedspi_capcom.ViewModels
 					break;
 				case CapcomMode.Connected:
 					CToken2.Cancel();
+					Capcom.Stop(); // for some random case
 					Video.Stop();
 					Status = CapcomMode.Idle;
 					break;

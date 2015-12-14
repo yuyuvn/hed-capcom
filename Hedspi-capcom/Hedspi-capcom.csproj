@@ -137,6 +137,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Controls\AppIcon.cs" />
+    <Compile Include="Models\CommandSender.cs" />
+    <Compile Include="Models\CommandSenders\CommandSender1_0_0.cs" />
+    <Compile Include="Models\CommandSenders\CommandSender1_1_0.cs" />
+    <Compile Include="Models\CommandSenderVersionSelector.cs" />
+    <Compile Include="Models\ICommandSender.cs" />
     <Compile Include="Models\TcpNetwork.cs" />
     <Compile Include="Models\UdpNetwork.cs" />
     <Compile Include="Models\Video.cs" />
