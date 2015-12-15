@@ -33,7 +33,7 @@ namespace Hedspi_capcom.Models
 			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			startInfo.CreateNoWindow = true;
 			startInfo.FileName = FilePath;
-			startInfo.Arguments = String.Format("-window_title Streaming -rtsp_flags listen rtsp://0.0.0.0:{0}/live.sdp?tcp -analyzeduration 500", port);
+			startInfo.Arguments = String.Format("-window_title Streaming -fflags nobuffer -an -rtsp_flags listen rtsp://0.0.0.0:{0}/live.sdp?tcp -analyzeduration 500 -fast", port);
 			Process.StartInfo = startInfo;
 
 			try
