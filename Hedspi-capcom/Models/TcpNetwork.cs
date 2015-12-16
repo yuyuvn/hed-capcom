@@ -58,7 +58,7 @@ namespace Hedspi_capcom.Models
 					// Perform a blocking call to accept requests.
 					// You could also user server.AcceptSocket() here.
 					TcpClient client = Connection.AcceptTcpClient();
-					Console.WriteLine("Connected!");
+                    Console.WriteLine("Connected!");
 
 					// Get a stream object for reading and writing
 					NetworkStream stream = client.GetStream();
@@ -88,7 +88,6 @@ namespace Hedspi_capcom.Models
 								{
 									conntectedHandler(data, stream, client);
 								}
-								stream.FlushAsync();
 
 								Thread.Sleep(16);
                             }

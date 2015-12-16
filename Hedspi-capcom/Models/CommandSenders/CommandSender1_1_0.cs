@@ -52,9 +52,12 @@ namespace Hedspi_capcom.Models.CommandSenders
 					BitConverter.GetBytes(state.Buttons.Y == ButtonState.Pressed).CopyTo(buffer, 17);
 					BitConverter.GetBytes(state.Buttons.B == ButtonState.Pressed).CopyTo(buffer, 18);
 					BitConverter.GetBytes(state.Buttons.A == ButtonState.Pressed).CopyTo(buffer, 19);
-
-					stream.Write(buffer, 0, buffer.Length);
+				} else
+				{
+					buffer = new byte[20];
+					Array.Clear(buffer,0,buffer.Length);
 				}
+				stream.Write(buffer, 0, buffer.Length);
 			}
 			catch (System.IO.IOException)
 			{
