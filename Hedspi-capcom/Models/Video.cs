@@ -33,7 +33,7 @@ namespace Hedspi_capcom.Models
 			startInfo.WindowStyle = ProcessWindowStyle.Hidden;
 			startInfo.CreateNoWindow = true;
 			startInfo.FileName = FilePath;
-			startInfo.Arguments = String.Format("-window_title Streaming -autoexit -fflags nobuffer -an rtp://0.0.0.0:{0} -analyzeduration 500 -fast", port);
+			startInfo.Arguments = String.Format("-window_title Streaming -autoexit -fflags nobuffer -an rtp://0.0.0.0:{0} -analyzeduration 500", port);
 			Process.StartInfo = startInfo;
 
 			try
