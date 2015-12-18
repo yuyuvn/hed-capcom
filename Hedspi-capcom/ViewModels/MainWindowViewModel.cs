@@ -177,25 +177,34 @@ namespace Hedspi_capcom.ViewModels
 					CommandHandler = new CommandSenderVersionSelector();
 					if (CommandHandler.StartSend(messages, stream))
 					{
-                        Console.WriteLine("Robo connected.");
+						Console.WriteLine("Robo connected.");
 						Status = CapcomMode.Connected;
 						CToken.Cancel();
 					}
 					else
 					{
 						Console.WriteLine("Data received: {0}", messages);
-                        stream.Close();
+						stream.Close();
 						client.Close();
 					}
 				}
 				else
 				{
-					if (!CommandHandler.Send(stream))
+					try
 					{
-						StartBroadcast();
+						if (!CommandHandler.Send(stream))
+						{
+							StartBroadcast();
+						}
+					}
+					catch (Exception e)
+					{
+						StopConnect();
+						StartListen();
+						Console.WriteLine(e);
 					}
 				}
-				
+
 			};
 
 			Capcom.DisConnectedHandler += () =>
@@ -213,37 +222,49 @@ namespace Hedspi_capcom.ViewModels
 			IPList = UnicastIPInfoCol.Where(u => u.Address.AddressFamily == AddressFamily.InterNetwork).Select(u => u.Address.ToString());
 		}
 
+		public void StartListen()
+		{
+			if (!Video.Start(12345)) return;
+			CToken = new CancellationTokenSource();
+			CToken2 = new CancellationTokenSource();
+			CancellationToken ct = CToken.Token;
+			CancellationToken ct2 = CToken2.Token;
+			Status = CapcomMode.NotConnected;
+			Task.Factory.StartNew(() => {
+				while (!ct.IsCancellationRequested)
+				{
+					//ct.ThrowIfCancellationRequested();
+					Broadcast.SendBroadcast(IPAddressInformation, 11000, String.Format("HED-Capcom v{0}\nIP:{1}\nCapcom:12000\nStream:12345", Version, IPAddressInformation.Address));
+					GamePadState state = GamePad.GetState(PlayerIndex.One);
+					if (state.IsConnected)
+					{
+						if (state.Buttons.Start == ButtonState.Pressed)
+						{
+							StartBroadcast();
+						}
+					}
+					Thread.Sleep(1000);
+				}
+			}, CToken.Token);
+
+			Task.Factory.StartNew(() => {
+				Capcom.StartListener(12000, ct2);
+			}, CToken2.Token);
+		}
+
+		public void StopConnect()
+		{
+			CToken2.Cancel();
+			Capcom.Stop(); // for some random case
+			Video.Stop();
+		}
+
 		public void StartBroadcast()
 		{
 			switch (Status)
 			{
 				case CapcomMode.Idle:
-					if (!Video.Start(12345)) break;
-					CToken = new CancellationTokenSource();
-					CToken2 = new CancellationTokenSource();
-					CancellationToken ct = CToken.Token;
-					CancellationToken ct2 = CToken2.Token;
-					Status = CapcomMode.NotConnected;
-					Task.Factory.StartNew(() => {
-						while (!ct.IsCancellationRequested)
-						{
-							//ct.ThrowIfCancellationRequested();
-							Broadcast.SendBroadcast(IPAddressInformation, 11000, String.Format("HED-Capcom v{0}\nIP:{1}\nCapcom:12000\nStream:12345", Version, IPAddressInformation.Address));
-							GamePadState state = GamePad.GetState(PlayerIndex.One);
-							if (state.IsConnected)
-							{
-								if (state.Buttons.Start == ButtonState.Pressed)
-								{
-									StartBroadcast();
-								}
-							}
-							Thread.Sleep(1000);
-						}
-					}, CToken.Token);
-
-					Task.Factory.StartNew(() => {
-						Capcom.StartListener(12000, ct2);
-					}, CToken2.Token);
+					StartListen();
 					break;
 				case CapcomMode.NotConnected:
 					Video.Stop();
@@ -252,9 +273,7 @@ namespace Hedspi_capcom.ViewModels
 					Status = CapcomMode.Idle;
 					break;
 				case CapcomMode.Connected:
-					CToken2.Cancel();
-					Capcom.Stop(); // for some random case
-					Video.Stop();
+					StopConnect();
 					Status = CapcomMode.Idle;
 					break;
 			}

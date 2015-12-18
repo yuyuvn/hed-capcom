@@ -54,7 +54,7 @@ namespace Hedspi_capcom.Models.CommandSenders
 			}
 			catch (System.IO.IOException)
 			{
-				return false;
+				throw;
 			}
 			return true;
 		}

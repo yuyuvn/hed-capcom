@@ -13,55 +13,75 @@ namespace Hedspi_capcom.Models.CommandSenders
 
 		public override Boolean Send(NetworkStream stream)
 		{
-			byte[] buffer;
+			byte[] buffer = null;
 
 			try
 			{
-				GamePadState state = GamePad.GetState(PlayerIndex.One);
-				if (state.IsConnected)
+				GamePadState state;
+                for (int i = 0;i<4;i++)
 				{
-					if (state.Buttons.Start == ButtonState.Pressed)
+					switch (i)
 					{
-						return false;
-                    }
-					buffer = new byte[20];
-
-					float leftX = state.ThumbSticks.Left.X;
-					float triggerRight = state.Triggers.Right;
-					float triggerLeft = state.Triggers.Left;
-
-
-					if (state.DPad.Left == ButtonState.Pressed || state.DPad.Right == ButtonState.Pressed)
-					{
-						leftX = state.DPad.Left == ButtonState.Pressed ? -0.5F : 0.5F;
+						case 1:
+							state = GamePad.GetState(PlayerIndex.Two);
+							break;
+						case 2:
+							state = GamePad.GetState(PlayerIndex.Three);
+							break;
+						case 3:
+							state = GamePad.GetState(PlayerIndex.Four);
+							break;
+						default:
+							state = GamePad.GetState(PlayerIndex.One);
+							break;
 					}
-					if (state.DPad.Up == ButtonState.Pressed)
+					if (state.IsConnected)
 					{
-						triggerRight = 0.5F;
-					}
-					if (state.DPad.Down == ButtonState.Pressed)
-					{
-						triggerLeft = 0.5F;
-					}
+						if (state.Buttons.Start == ButtonState.Pressed)
+						{
+							return false;
+						}
+						buffer = new byte[20];
 
-					BitConverter.GetBytes(leftX).CopyTo(buffer, 0);
-					BitConverter.GetBytes(state.ThumbSticks.Left.Y).CopyTo(buffer, 4);
-					BitConverter.GetBytes(triggerRight).CopyTo(buffer, 8);
-					BitConverter.GetBytes(triggerLeft).CopyTo(buffer, 12);
-					BitConverter.GetBytes(state.Buttons.X == ButtonState.Pressed).CopyTo(buffer, 16);
-					BitConverter.GetBytes(state.Buttons.Y == ButtonState.Pressed).CopyTo(buffer, 17);
-					BitConverter.GetBytes(state.Buttons.B == ButtonState.Pressed).CopyTo(buffer, 18);
-					BitConverter.GetBytes(state.Buttons.A == ButtonState.Pressed).CopyTo(buffer, 19);
-				} else
+						float leftX = state.ThumbSticks.Left.X;
+						float triggerRight = state.Triggers.Right;
+						float triggerLeft = state.Triggers.Left;
+
+
+						if (state.DPad.Left == ButtonState.Pressed || state.DPad.Right == ButtonState.Pressed)
+						{
+							leftX = state.DPad.Left == ButtonState.Pressed ? -0.5F : 0.5F;
+						}
+						if (state.DPad.Up == ButtonState.Pressed)
+						{
+							triggerRight = 0.5F;
+						}
+						if (state.DPad.Down == ButtonState.Pressed)
+						{
+							triggerLeft = 0.5F;
+						}
+
+						BitConverter.GetBytes(leftX).CopyTo(buffer, 0);
+						BitConverter.GetBytes(state.ThumbSticks.Left.Y).CopyTo(buffer, 4);
+						BitConverter.GetBytes(triggerRight).CopyTo(buffer, 8);
+						BitConverter.GetBytes(triggerLeft).CopyTo(buffer, 12);
+						BitConverter.GetBytes(state.Buttons.X == ButtonState.Pressed).CopyTo(buffer, 16);
+						BitConverter.GetBytes(state.Buttons.Y == ButtonState.Pressed).CopyTo(buffer, 17);
+						BitConverter.GetBytes(state.Buttons.B == ButtonState.Pressed).CopyTo(buffer, 18);
+						BitConverter.GetBytes(state.Buttons.A == ButtonState.Pressed).CopyTo(buffer, 19);
+						break;
+					}
+				}
+				if (buffer == null)
 				{
 					buffer = new byte[20];
-					Array.Clear(buffer,0,buffer.Length);
+					Array.Clear(buffer, 0, buffer.Length);
 				}
 				stream.Write(buffer, 0, buffer.Length);
 			}
 			catch (System.IO.IOException)
 			{
-				return false;
+				throw;
 			}
 			return true;
 		}
