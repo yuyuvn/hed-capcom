@@ -49,27 +49,27 @@
 					Height="4"/>
 
 			<controls:AppIcon Width="36"
-							Height="36"
-							Background="Transparent"
-							AnchorVisibility="Collapsed"
-							BandVisibility="Collapsed"
-					Margin="10 0 0 0">
+							  Height="36"
+							  Background="Transparent"
+							  AnchorVisibility="Collapsed"
+							  BandVisibility="Collapsed"
+							  Margin="10 0 0 0">
 				<controls:AppIcon.Style>
 					<Style TargetType="{x:Type controls:AppIcon}">
 						<Setter Property="Background"
-				Value="#FF333333" />
+								Value="#FF333333" />
 						<Setter Property="Template">
 							<Setter.Value>
 								<ControlTemplate TargetType="{x:Type controls:AppIcon}">
 									<Border Background="{TemplateBinding Background}"
-							BorderBrush="{TemplateBinding BorderBrush}"
-							BorderThickness="{TemplateBinding BorderThickness}">
+											BorderBrush="{TemplateBinding BorderBrush}"
+											BorderThickness="{TemplateBinding BorderThickness}">
 										<Viewbox>
 											<Canvas HorizontalAlignment="Left"
-									Height="392"
-									UseLayoutRounding="False"
-									VerticalAlignment="Top"
-									Width="669">
+													Height="392"
+													UseLayoutRounding="False"
+													VerticalAlignment="Top"
+													Width="669">
 												<Path Fill="#0067ab" Data=" M 15.35 5.51 C 18.85 4.58 22.50 5.22 26.06 5.37 C 85.68 8.89 145.30 12.52 204.88 16.70 C 209.19 17.06 214.79 19.86 214.03 25.00 C 213.87 67.68 214.26 110.36 213.77 153.02 C 214.26 158.12 208.36 160.57 204.10 160.68 C 143.09 162.92 82.06 164.95 21.04 167.29 C 16.35 167.90 9.76 165.69 9.76 160.08 C 10.74 110.41 8.69 60.72 9.80 11.04 C 9.64 7.91 12.71 6.15 15.35 5.51 Z" />
 												<Path Fill="#0067ab" Data=" M 635.51 5.81 C 641.03 5.62 646.53 4.89 652.06 5.05 C 655.10 5.31 659.02 6.70 659.65 10.10 C 660.87 59.09 658.74 108.09 659.74 157.08 C 659.88 162.02 654.21 164.58 649.93 164.26 C 590.60 161.84 531.25 159.94 471.91 157.67 C 467.62 157.52 462.08 154.99 462.50 149.92 C 462.48 107.95 462.53 65.97 462.48 24.00 C 461.99 18.94 467.76 16.70 471.90 16.36 C 526.41 12.52 580.96 9.10 635.51 5.81 Z" />
 												<Path Fill="#1894d1" Data=" M 235.32 18.48 C 238.77 17.37 242.44 17.80 246.01 17.74 C 309.69 17.75 373.37 17.75 437.05 17.74 C 440.68 17.73 444.74 18.93 446.80 22.14 C 447.41 23.67 447.20 25.37 447.28 26.97 C 447.21 68.66 447.28 110.34 447.25 152.02 C 447.54 157.30 441.22 159.22 436.97 159.23 C 371.34 159.27 305.69 159.27 240.05 159.23 C 235.87 159.21 229.64 157.20 229.99 152.03 C 230.04 109.35 229.94 66.66 230.03 23.98 C 229.99 21.03 232.85 19.29 235.32 18.48 Z" />
@@ -115,33 +115,55 @@
 			<TextBlock Text="Network Interface:"/>
 
 			<metro:PromptComboBox Grid.Column="1"
-                                    Margin="8 0 0 8"
-                                    HorizontalAlignment="Stretch"
-                                  Prompt="You are not connect to any interface"
-                                    ItemsSource="{Binding Interfaces}"
-                                  SelectedItem="{Binding Interface}"
-                                    IsReadOnly="True"
-                                    MinWidth="200" />
+								  Margin="8 0 0 8"
+								  HorizontalAlignment="Stretch"
+								  Prompt="You are not connect to any interface"
+								  ItemsSource="{Binding Interfaces}"
+								  SelectedItem="{Binding Interface}"
+								  IsReadOnly="True"
+								  MinWidth="200">
+				<metro:PromptComboBox.Style>
+					<Style TargetType="{x:Type metro:PromptComboBox}">
+						<Setter Property="IsEnabled" Value="False" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Status}" Value="Idle">
+								<Setter Property="IsEnabled" Value="True" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</metro:PromptComboBox.Style>
+			</metro:PromptComboBox>
 
 			<TextBlock Text="IP Address:" Grid.Row="1"/>
 
 			<metro:PromptComboBox Grid.Column="1"
-                                  Grid.Row="1"
-                                    Margin="8 0 0 0"
-                                    HorizontalAlignment="Stretch"
-                                    ItemsSource="{Binding IPList}"
-                                  SelectedItem="{Binding IPAddress}"
-                                  Prompt="You don't have IP Address"
-                                    IsReadOnly="True"
-                                    MinWidth="200" />
+								  Grid.Row="1"
+								  Margin="8 0 0 0"
+								  HorizontalAlignment="Stretch"
+								  ItemsSource="{Binding IPList}"
+								  SelectedItem="{Binding IPAddress}"
+								  Prompt="You don't have IP Address"
+								  IsReadOnly="True"
+								  MinWidth="200">
+				<metro:PromptComboBox.Style>
+					<Style TargetType="{x:Type metro:PromptComboBox}">
+						<Setter Property="IsEnabled" Value="False" />
+						<Style.Triggers>
+							<DataTrigger Binding="{Binding Status}" Value="Idle">
+								<Setter Property="IsEnabled" Value="True" />
+							</DataTrigger>
+						</Style.Triggers>
+					</Style>
+				</metro:PromptComboBox.Style>
+			</metro:PromptComboBox>
 
 			<metro2:CallMethodButton DockPanel.Dock="Right"
-                                     Grid.Row="2"
-                                     Grid.ColumnSpan="2"
+									 Grid.Row="2"
+									 Grid.ColumnSpan="2"
 									 VerticalAlignment="Stretch"
 									 MethodName="StartBroadcast"
 									 MinWidth="110"
-                                     MinHeight="40"
+									 MinHeight="40"
 									 Padding="30,6"
 									 Margin="6">
 				<metro2:CallMethodButton.Style>
